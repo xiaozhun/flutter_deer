@@ -1,3 +1,8 @@
+// 订单列表页面
+// 订单列表页面使用工具类DioUtils.instance.requestNetwork进行网络请求
+// 请求地址:http://192.168.11.131:8866/tradeOrders/getTradeOrdersList?page=1&pageSize=10 请求方法:POST，请求字段{"pageNum":1,"pageSize":10,"orderStatus":0,"orderType":0,"orderId":0,"orderNo":""}
+// 请求成功后，将数据绑定到ListView中
+
 import 'package:common_utils/common_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_deer/order/widgets/pay_type_dialog.dart';
@@ -19,10 +24,12 @@ class OrderItem extends StatelessWidget {
     super.key,
     required this.tabIndex,
     required this.index,
+    required this.orderId,
   });
 
   final int tabIndex;
   final int index;
+  final String orderId;
   
   @override
   Widget build(BuildContext context) {
@@ -40,7 +47,7 @@ class OrderItem extends StatelessWidget {
       )
     );
   }
-
+  // 列表页面
   Widget _buildContent(BuildContext context) {
     final TextStyle? textTextStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: Dimens.font_sp12);
     final bool isDark = context.isDark;
@@ -63,7 +70,7 @@ class OrderItem extends StatelessWidget {
         ),
         Gaps.vGap8,
         Text(
-          '西安市雁塔区 鱼化寨街道唐兴路唐兴数码3楼318',
+          '西安市雁塔区 $orderId',
           style: Theme.of(context).textTheme.titleSmall,
         ),
         Gaps.vGap8,

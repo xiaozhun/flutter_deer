@@ -184,9 +184,9 @@ class _OrderPageState extends State<OrderPage> with AutomaticKeepAliveClientMixi
                     indicatorColor: Colors.transparent,
                     tabs: const <Widget>[
                       _TabView(0, '新订单'),
-                      _TabView(1, '待配送'),
-                      _TabView(2, '待完成'),
-                      _TabView(3, '已完成'),
+                      _TabView(1, '已买入'),
+                      _TabView(2, '已卖出'),
+                      _TabView(3, '进行中'),
                       _TabView(4, '已取消'),
                     ],
                     onTap: (index) {
