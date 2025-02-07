@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_deer/res/constant.dart';
+import 'package:sp_util/sp_util.dart';
 
 import '../../net/dio_utils.dart';
 import '../../net/http_api.dart';
@@ -86,6 +88,8 @@ class _LoginPage2State extends State<LoginPage2> {
           },
           onSuccess: (data) {
             debugPrint('Response Data: $data');
+            // 将获取到的token保存到本地存储中，以便下次登录时使用
+            SpUtil.putString(Constant.accessToken, data!['token'] as String);
             Navigator.pushReplacementNamed(context, '/home');
           },
           onError: (code, msg) {

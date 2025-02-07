@@ -17,7 +17,8 @@ class AuthInterceptor extends Interceptor {
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     final String accessToken = SpUtil.getString(Constant.accessToken).nullSafe;
     if (accessToken.isNotEmpty) {
-      options.headers['Authorization'] = 'token $accessToken';
+      // x-token Authorization
+      options.headers['x-token'] = accessToken;
     }
     if (!Device.isWeb) {
       // https://developer.github.com/v3/#user-agent-required
