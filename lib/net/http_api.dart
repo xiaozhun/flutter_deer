@@ -7,4 +7,5 @@ class HttpApi{
 //   trader
   static const String captcha = 'base/captcha';
   static const String login = 'base/login';
+  static const String orders = 'tradeOrders/getTradeOrdersList';
 }

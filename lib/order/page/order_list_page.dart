@@ -1,4 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_deer/net/dio_utils.dart';
+import 'package:flutter_deer/net/http_api.dart';
+import 'package:flutter_deer/order/models/trade_entity.dart';
 import 'package:flutter_deer/order/provider/order_page_provider.dart';
 import 'package:flutter_deer/order/widgets/order_item.dart';
 import 'package:flutter_deer/order/widgets/order_tag_item.dart';
@@ -8,29 +12,31 @@ import 'package:flutter_deer/widgets/state_layout.dart';
 import 'package:provider/provider.dart';
 
 class OrderListPage extends StatefulWidget {
-
   const OrderListPage({
     super.key,
     required this.index,
   });
 
   final int index;
-  
+
   @override
   _OrderListPageState createState() => _OrderListPageState();
 }
 
-class _OrderListPageState extends State<OrderListPage> with AutomaticKeepAliveClientMixin<OrderListPage>, ChangeNotifierMixin<OrderListPage>{
-
+class _OrderListPageState extends State<OrderListPage>
+    with
+        AutomaticKeepAliveClientMixin<OrderListPage>,
+        ChangeNotifierMixin<OrderListPage> {
   final ScrollController _controller = ScrollController();
   final StateType _stateType = StateType.loading;
+
   /// 是否正在加载数据
   bool _isLoading = false;
   final int _maxPage = 3;
   int _page = 1;
   int _index = 0;
   List<String> _list = <String>[];
-  
+
   @override
   void initState() {
     super.initState();
@@ -42,7 +48,7 @@ class _OrderListPageState extends State<OrderListPage> with AutomaticKeepAliveCl
   Map<ChangeNotifier, List<VoidCallback>?>? changeNotifier() {
     return {_controller: null};
   }
-  
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -55,7 +61,9 @@ class _OrderListPageState extends State<OrderListPage> with AutomaticKeepAliveCl
       },
       child: RefreshIndicator(
         onRefresh: _onRefresh,
-        displacement: 120.0, /// 默认40， 多添加的80为Header高度
+        displacement: 120.0,
+
+        /// 默认40， 多添加的80为Header高度
         child: Consumer<OrderPageProvider>(
           builder: (_, provider, child) {
             return CustomScrollView(
@@ -66,7 +74,8 @@ class _OrderListPageState extends State<OrderListPage> with AutomaticKeepAliveCl
               slivers: <Widget>[
                 SliverOverlapInjector(
                   ///SliverAppBar的expandedHeight高度,避免重叠
-                  handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                  handle:
+                      NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                 ),
                 child!,
               ],
@@ -74,18 +83,23 @@ class _OrderListPageState extends State<OrderListPage> with AutomaticKeepAliveCl
           },
           child: SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            sliver: _list.isEmpty ? SliverFillRemaining(child: StateLayout(type: _stateType)) :
-            SliverList(
-              delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-                return index < _list.length ? 
-                (index % 5 == 0 ? 
-                    const OrderTagItem(date: '2025年2月5日', orderTotal: 4) :
-                    OrderItem(key: Key('order_item_$index'), index: index, tabIndex: _index,orderId: _list[index])
-                ) : 
-                MoreWidget(_list.length, _hasMore(), 10);
-              },
-              childCount: _list.length + 1),
-            ),
+            sliver: _list.isEmpty
+                ? SliverFillRemaining(child: StateLayout(type: _stateType))
+                : SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                      return index < _list.length
+                          ? (index % 5 == 0
+                              ? const OrderTagItem(
+                                  date: '2025年2月5日', orderTotal: 4)
+                              : OrderItem(
+                                  key: Key('order_item_$index'),
+                                  index: index,
+                                  tabIndex: _index,
+                                  orderId: _list[index]))
+                          : MoreWidget(_list.length, _hasMore(), 10);
+                    }, childCount: _list.length + 1),
+                  ),
           ),
         ),
       ),
@@ -99,6 +113,25 @@ class _OrderListPageState extends State<OrderListPage> with AutomaticKeepAliveCl
         _list = List.generate(10, (i) => 'newItem：$i');
       });
     });
+    final queryParameters = {
+      'page': 1,
+      'pageSize': 10,
+    };
+    try {
+      await DioUtils.instance.requestNetwork<List<Trade>>(
+        Method.get,
+        HttpApi.orders,
+        onSuccess: (data) {
+          debugPrint('获取订单列表成功: $data');
+        },
+        onError: (code, msg) {
+          debugPrint('报错信息：$code, $msg');
+        },
+        queryParameters: queryParameters,
+      );
+    } catch (e) {
+      debugPrint('获取订单列表失败: $e');
+    } finally {}
   }
 
   bool _hasMore() {
@@ -116,12 +149,12 @@ class _OrderListPageState extends State<OrderListPage> with AutomaticKeepAliveCl
     await Future.delayed(const Duration(seconds: 2), () {
       setState(() {
         _list.addAll(List.generate(10, (i) => 'newItem：$i'));
-        _page ++;
+        _page++;
         _isLoading = false;
       });
     });
   }
-  
+
   @override
   bool get wantKeepAlive => true;
 }
