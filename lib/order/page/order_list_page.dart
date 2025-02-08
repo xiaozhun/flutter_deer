@@ -119,6 +119,7 @@ class _OrderListPageState extends State<OrderListPage>
     };
     // 调用_getOrderList函数
     _getOrderList(queryParameters).then((tradeOrders) {
+      debugPrint("获取交易所: ${tradeOrders[0].exchange}");
       setState(() {
         _page = 1;
         _list = tradeOrders;

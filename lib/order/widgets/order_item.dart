@@ -71,7 +71,7 @@ class OrderItem extends StatelessWidget {
         ),
         Gaps.vGap8,
         Text(
-          '西安市雁塔区 $order.tradeNo',
+          '西安市雁塔区$index',
           style: Theme.of(context).textTheme.titleSmall,
         ),
         Gaps.vGap8,
