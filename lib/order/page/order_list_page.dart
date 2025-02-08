@@ -118,16 +118,17 @@ class _OrderListPageState extends State<OrderListPage>
       'pageSize': 10,
     };
     // 调用_getOrderList函数
-    List<Trade> tradeOrders =await _getOrderList(queryParameters);
-    setState(() {
-      _page = 1;
-      _list = tradeOrders;
+    _getOrderList(queryParameters).then((tradeOrders) {
+      setState(() {
+        _page = 1;
+        _list = tradeOrders;
+      });
     });
   }
 
   // 将加载数据提取出来
   Future<List<Trade>> _getOrderList(
-    Map<String, dynamic> queryParameters) async {
+      Map<String, dynamic> queryParameters) async {
     try {
       final response =
           await DioUtils.instance.requestNetwork<Map<String, dynamic>>(
@@ -166,17 +167,18 @@ class _OrderListPageState extends State<OrderListPage>
     _isLoading = true;
     try {
       final queryParameters = {
-        'page': _page==1?_page+1:_page,
+        'page': _page == 1 ? _page + 1 : _page,
         'pageSize': 10,
       };
       // 调用_getOrderList函数
-      List<Trade> tradeOrders =await _getOrderList(queryParameters);
-      setState(() {
-        _list.addAll(tradeOrders);
-        _page++;
-        _isLoading= false;
+      _getOrderList(queryParameters).then((tradeOrders) {
+        setState(() {
+          _list.addAll(tradeOrders);
+          _page++;
+          _isLoading = false;
+        });
       });
-    }catch (e) {
+    } catch (e) {
       debugPrint('加载更多失败: $e');
       _isLoading = false;
     }
