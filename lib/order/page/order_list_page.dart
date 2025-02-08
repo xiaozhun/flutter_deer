@@ -118,39 +118,38 @@ class _OrderListPageState extends State<OrderListPage>
       'pageSize': 10,
     };
     // 调用_getOrderList函数
-    _getOrderList(queryParameters).then((tradeOrders) {
-      debugPrint("获取交易所: ${tradeOrders[0].exchange}");
-      setState(() {
-        _page = 1;
-        _list = tradeOrders;
-      });
-    });
+    _getOrderList(queryParameters, '_onRefresh');
   }
 
   // 将加载数据提取出来
-  Future<List<Trade>> _getOrderList(
-      Map<String, dynamic> queryParameters) async {
+  void _getOrderList(Map<String, dynamic> queryParameters, String type) async {
     try {
-      final response =
-          await DioUtils.instance.requestNetwork<Map<String, dynamic>>(
-        Method.get,
-        HttpApi.orders,
-        queryParameters: queryParameters,
-      );
-      if (response != null && response['list'] is List) {
-        debugPrint("获取订单数量: ${response['total']}");
+      await DioUtils.instance.requestNetwork<Map<String, dynamic>>(
+          Method.get, HttpApi.orders, queryParameters: queryParameters,
+          onSuccess: (data) {
+        debugPrint("获取订单数量: ${data!['total']}");
         // 将获取的列表转换为List<Trade>
-        List listRes = response['list'] as List;
+        List listRes = data!['list'] as List;
         List<Trade> tradeOrders = listRes
             .map((item) => Trade.fromJson(item as Map<String, dynamic>))
             .toList();
-        return tradeOrders;
-      } else {
-        return <Trade>[];
-      }
+        if (type == '_loadMore') {
+          setState(() {
+            _list.addAll(tradeOrders);
+            _page++;
+            _isLoading = false;
+          });
+        } else if (type == '_onRefresh') {
+          setState(() {
+            _page = 1;
+            _list = tradeOrders;
+          });
+        }
+      }, onError: (code, msg) {
+        debugPrint('报错信息：$code, $msg');
+      });
     } catch (e) {
       debugPrint('获取订单列表失败: $e');
-      return <Trade>[];
     }
   }
 
@@ -172,13 +171,7 @@ class _OrderListPageState extends State<OrderListPage>
         'pageSize': 10,
       };
       // 调用_getOrderList函数
-      _getOrderList(queryParameters).then((tradeOrders) {
-        setState(() {
-          _list.addAll(tradeOrders);
-          _page++;
-          _isLoading = false;
-        });
-      });
+      _getOrderList(queryParameters, '_loadMore');
     } catch (e) {
       debugPrint('加载更多失败: $e');
       _isLoading = false;
