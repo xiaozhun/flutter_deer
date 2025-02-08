@@ -18,7 +18,7 @@ class BaseEntity<T> {
     if (json.containsKey(Constant.data)) {
       data = _generateOBJ<T>(json[Constant.data] as Object?);
     }
-    debugPrint('打印data: ${data}');
+    // debugPrint('打印data: ${data}');
   }
 
   int? code;

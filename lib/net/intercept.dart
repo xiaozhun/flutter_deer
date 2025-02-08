@@ -16,6 +16,10 @@ class AuthInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     final String accessToken = SpUtil.getString(Constant.accessToken).nullSafe;
+    // 添加token,适配测试环境,判断options.queryParameters是否含有token这个键值，如过有则取出添加到headers
+    if (options.queryParameters.containsKey('token')) {
+      options.headers['x-token'] = options.queryParameters['token'];
+    }
     if (accessToken.isNotEmpty) {
       // x-token Authorization
       options.headers['x-token'] = accessToken;

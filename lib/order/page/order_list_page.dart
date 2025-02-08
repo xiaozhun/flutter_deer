@@ -35,7 +35,7 @@ class _OrderListPageState extends State<OrderListPage>
   final int _maxPage = 3;
   int _page = 1;
   int _index = 0;
-  List<String> _list = <String>[];
+  List<Trade> _list = <Trade>[];
 
   @override
   void initState() {
@@ -96,7 +96,7 @@ class _OrderListPageState extends State<OrderListPage>
                                   key: Key('order_item_$index'),
                                   index: index,
                                   tabIndex: _index,
-                                  orderId: _list[index]))
+                                  order: _list[index]))
                           : MoreWidget(_list.length, _hasMore(), 10);
                     }, childCount: _list.length + 1),
                   ),
@@ -107,31 +107,49 @@ class _OrderListPageState extends State<OrderListPage>
   }
 
   Future<void> _onRefresh() async {
-    await Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        _page = 1;
-        _list = List.generate(10, (i) => 'newItem：$i');
-      });
-    });
+    // await Future.delayed(const Duration(seconds: 2), () {
+    //   setState(() {
+    //     _page = 1;
+    //     _list = List.generate(10, (i) => 'newItem：$i');
+    //   });
+    // });
     final queryParameters = {
-      'page': 1,
+      'page': _page,
       'pageSize': 10,
     };
+    // 调用_getOrderList函数
+    Future<List<Trade>> tradeOrders = _getOrderList(queryParameters);
+    setState(() {
+      _page = 1;
+      _list = tradeOrders as List<Trade>;
+    });
+  }
+
+  // 将加载数据提取出来
+  Future<List<Trade>> _getOrderList(
+    Map<String, dynamic> queryParameters) async {
     try {
-      await DioUtils.instance.requestNetwork<List<Trade>>(
+      final response =
+          await DioUtils.instance.requestNetwork<Map<String, dynamic>>(
         Method.get,
         HttpApi.orders,
-        onSuccess: (data) {
-          debugPrint('获取订单列表成功: $data');
-        },
-        onError: (code, msg) {
-          debugPrint('报错信息：$code, $msg');
-        },
         queryParameters: queryParameters,
       );
+      if (response != null && response['list'] is List) {
+        debugPrint("获取订单数量: ${response['total']}");
+        // 将获取的列表转换为List<Trade>
+        List listRes = response['list'] as List;
+        List<Trade> tradeOrders = listRes
+            .map((item) => Trade.fromJson(item as Map<String, dynamic>))
+            .toList();
+        return tradeOrders;
+      } else {
+        return <Trade>[];
+      }
     } catch (e) {
       debugPrint('获取订单列表失败: $e');
-    } finally {}
+      return <Trade>[];
+    }
   }
 
   bool _hasMore() {
@@ -146,13 +164,29 @@ class _OrderListPageState extends State<OrderListPage>
       return;
     }
     _isLoading = true;
-    await Future.delayed(const Duration(seconds: 2), () {
+    try {
+      final queryParameters = {
+        'page': _page==1?_page+1:_page,
+        'pageSize': 10,
+      };
+      // 调用_getOrderList函数
+      Future<List<Trade>> tradeOrders = _getOrderList(queryParameters);
       setState(() {
-        _list.addAll(List.generate(10, (i) => 'newItem：$i'));
+        _list.addAll(tradeOrders as List<Trade>);
         _page++;
-        _isLoading = false;
+        _isLoading= false;
       });
-    });
+    }catch (e) {
+      debugPrint('加载更多失败: $e');
+      _isLoading = false;
+    }
+    // await Future.delayed(const Duration(seconds: 2), () {
+    //   setState(() {
+    //     _list.addAll(List.generate(10, (i) => 'newItem：$i'));
+    //     _page++;
+    //     _isLoading = false;
+    //   });
+    // });
   }
 
   @override

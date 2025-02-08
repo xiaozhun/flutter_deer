@@ -5,6 +5,7 @@
 
 import 'package:common_utils/common_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_deer/order/models/trade_entity.dart';
 import 'package:flutter_deer/order/widgets/pay_type_dialog.dart';
 import 'package:flutter_deer/res/resources.dart';
 import 'package:flutter_deer/routers/fluro_navigator.dart';
@@ -24,12 +25,12 @@ class OrderItem extends StatelessWidget {
     super.key,
     required this.tabIndex,
     required this.index,
-    required this.orderId,
+    required this.order,
   });
 
   final int tabIndex;
   final int index;
-  final String orderId;
+  final Trade order;
   
   @override
   Widget build(BuildContext context) {
@@ -70,7 +71,7 @@ class OrderItem extends StatelessWidget {
         ),
         Gaps.vGap8,
         Text(
-          '西安市雁塔区 $orderId',
+          '西安市雁塔区 $order.tradeNo',
           style: Theme.of(context).textTheme.titleSmall,
         ),
         Gaps.vGap8,

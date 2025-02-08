@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_deer/login/models/captcha_entity.dart';
 import 'package:flutter_deer/net/intercept.dart';
 import 'package:flutter_deer/net/net.dart';
+import 'package:flutter_deer/order/models/trade_entity.dart';
 import 'package:flutter_deer/res/constant.dart';
 import 'package:flutter_deer/shop/models/user_entity.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -35,27 +36,24 @@ void initDio() {
 
 void main() {
   // 确保绑定已初始化
-  TestWidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   // Dio dio;
-  // setUp(() async {
-  //   // 设置 SharedPreferences 的模拟初始值
-  //   SharedPreferences.setMockInitialValues({
-  //     'accessToken':
-  //         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVVUlEIjoiYzE5ODY5OTAtOGE3NC00ZGI2LThjMWYtYmM2NTBhZTg1MjdmIiwiSUQiOjEsIlVzZXJuYW1lIjoiYWRtaW4iLCJOaWNrTmFtZSI6IuWwj-WHhiIsIkF1dGhvcml0eUlkIjo4ODgsIkJ1ZmZlclRpbWUiOjg2NDAwLCJpc3MiOiJ0cmFkZSIsImF1ZCI6WyJHVkEiXSwiZXhwIjoxNzM5NTE3NzY1LCJuYmYiOjE3Mzg5MTI5NjV9.IZMzt18yo21bfJ9vzL5vJqTLdOVwm-qwHVeyjyHLkS0',
-  //   });
-  //   initDio();
-  //   // 初始化 SpUtil
-  //   await SpUtil.getInstance();
-  // });
+  setUp(() async {
+    // 设置 SharedPreferences 的模拟初始值
+    initDio();
+    // 初始化 SpUtil
+    // await SpUtil.getInstance();
+    // SpUtil.putString(Constant.accessToken, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVVUlEIjoiYzE5ODY5OTAtOGE3NC00ZGI2LThjMWYtYmM2NTBhZTg1MjdmIiwiSUQiOjEsIlVzZXJuYW1lIjoiYWRtaW4iLCJOaWNrTmFtZSI6IuWwj-WHhiIsIkF1dGhvcml0eUlkIjo4ODgsIkJ1ZmZlclRpbWUiOjg2NDAwLCJpc3MiOiJ0cmFkZSIsImF1ZCI6WyJHVkEiXSwiZXhwIjoxNzM5NTE3NzY1LCJuYmYiOjE3Mzg5MTI5NjV9.IZMzt18yo21bfJ9vzL5vJqTLdOVwm-qwHVeyjyHLkS0');
+  });
 
   group('base', () {
-    Dio dio;
-    setUp(() {
-      /// 测试配置
-      /// 测试配置 /base/captcha
-      dio = DioUtils.instance.dio;
-      dio.options.baseUrl = 'http://192.168.15.104:8888/';
-    });
+    // Dio dio;
+    // setUp(() {
+    //   /// 测试配置
+    //   /// 测试配置 /base/captcha
+    //   dio = DioUtils.instance.dio;
+    //   dio.options.baseUrl = 'http://192.168.15.104:8888/';
+    // });
     // initDio();
     // 设置 SharedPreferences 的模拟初始值
     // SharedPreferences.setMockInitialValues({
@@ -85,20 +83,35 @@ void main() {
       final queryParameters = {
         'page': 1,
         'pageSize': 10,
+        'token':
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVVUlEIjoiYzE5ODY5OTAtOGE3NC00ZGI2LThjMWYtYmM2NTBhZTg1MjdmIiwiSUQiOjEsIlVzZXJuYW1lIjoiYWRtaW4iLCJOaWNrTmFtZSI6IuWwj-WHhiIsIkF1dGhvcml0eUlkIjo4ODgsIkJ1ZmZlclRpbWUiOjg2NDAwLCJpc3MiOiJ0cmFkZSIsImF1ZCI6WyJHVkEiXSwiZXhwIjoxNzM5NTE3NzY1LCJuYmYiOjE3Mzg5MTI5NjV9.IZMzt18yo21bfJ9vzL5vJqTLdOVwm-qwHVeyjyHLkS0'
       };
-      var accessToken = SpUtil.getString(Constant.accessToken);
-      debugPrint('token: $accessToken');
       await DioUtils.instance.requestNetwork<Map<String, dynamic>>(
           Method.get, 'tradeOrders/getTradeOrdersList',
           queryParameters: queryParameters, onSuccess: (data) {
         // 打印完整的响应内容
         debugPrint('Response Data: ${data!.keys}');
-        // debugPrint('Response Data: ${data!['captchaId']}');
-        // 打印完整的响应内容
-        // debugPrint('Response Code: ${data.statusCode}');
-        // debugPrint('Response Headers: ${data.headers}');
-        // debugPrint('Response Data: ${data.data}');
-        // expect(data?.name, '唯鹿');
+        debugPrint("获取数量: ${data['total']}");
+        if (data!['list'] is List) {
+          // 将获取的列表转化body'转换为List<Trade>
+          List listRes = data['list'] as List;
+          List<Trade> tradeOrders = listRes
+              .map((item) => Trade.fromJson(item as Map<String, dynamic>))
+              .toList();
+          for (var tradeOrder in tradeOrders) {
+            print('Trade Order ID: ${tradeOrder.tradeId}');
+            print('User UUID: ${tradeOrder.useruuid}');
+            print('Exchange: ${tradeOrder.exchange}');
+            print('Trade Date: ${tradeOrder.tradedate}');
+            print('Stock Code: ${tradeOrder.stockCode}');
+            print('Trade Price: ${tradeOrder.tradeprice}');
+            print('Trade Number: ${tradeOrder.tradenumber}');
+            print('Trade Type: ${tradeOrder.tradetype}');
+            print('Fees: ${tradeOrder.fees}');
+            print('State: ${tradeOrder.state}');
+            print('-------------------');
+          }
+        }
       }, onError: (code, msg) {
         debugPrint('报错信息：$code, $msg');
       });

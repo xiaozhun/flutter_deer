@@ -184,7 +184,7 @@ class _OrderInfoPageState extends State<OrderInfoPage> {
       ),
     );
   }
-
+  // 商品详情 跟踪页面
   Widget _buildOrderGoodsItem(int index) {
     final Widget item = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
