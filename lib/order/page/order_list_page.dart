@@ -118,10 +118,10 @@ class _OrderListPageState extends State<OrderListPage>
       'pageSize': 10,
     };
     // 调用_getOrderList函数
-    Future<List<Trade>> tradeOrders = _getOrderList(queryParameters);
+    List<Trade> tradeOrders =await _getOrderList(queryParameters);
     setState(() {
       _page = 1;
-      _list = tradeOrders as List<Trade>;
+      _list = tradeOrders;
     });
   }
 
@@ -170,9 +170,9 @@ class _OrderListPageState extends State<OrderListPage>
         'pageSize': 10,
       };
       // 调用_getOrderList函数
-      Future<List<Trade>> tradeOrders = _getOrderList(queryParameters);
+      List<Trade> tradeOrders =await _getOrderList(queryParameters);
       setState(() {
-        _list.addAll(tradeOrders as List<Trade>);
+        _list.addAll(tradeOrders);
         _page++;
         _isLoading= false;
       });
