@@ -183,8 +183,8 @@ class _OrderPageState extends State<OrderPage> with AutomaticKeepAliveClientMixi
                     ),
                     indicatorColor: Colors.transparent,
                     tabs: const <Widget>[
-                      _TabView(0, '新订单'),
-                      _TabView(1, '已买入'),
+                      _TabView(0, '新买单'),
+                      _TabView(1, '未卖出'),
                       _TabView(2, '已卖出'),
                       _TabView(3, '进行中'),
                       _TabView(4, '已取消'),
@@ -235,10 +235,13 @@ class _TabView extends StatelessWidget {
 
   final int index;
   final String text;
+
+
   
   @override
   Widget build(BuildContext context) {
     final List<List<String>> imgList = context.isDark ? darkImg : img;
+    final provider = Provider.of<OrderPageProvider>(context);
     return Stack(
       children: <Widget>[
         Container(
@@ -262,9 +265,9 @@ class _TabView extends StatelessWidget {
               color: Theme.of(context).colorScheme.error,
               borderRadius: BorderRadius.circular(11.0),
             ),
-            child: const Padding(
+            child:  Padding(
               padding: EdgeInsets.symmetric(horizontal: 5.5, vertical: 2.0),
-              child: Text('10', style: TextStyle(color: Colors.white, fontSize: Dimens.font_sp12),),
+              child: Text(provider.badgeNumber1.toString(), style: TextStyle(color: Colors.white, fontSize: Dimens.font_sp12),),
             ),
           ) : Gaps.empty,
         )

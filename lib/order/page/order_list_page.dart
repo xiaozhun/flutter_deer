@@ -105,20 +105,44 @@ class _OrderListPageState extends State<OrderListPage>
       ),
     );
   }
+  // 动态添加查询参数
+  Map<String, dynamic> _addQueryParams(Map<String, dynamic> params) {
+    // 根据_index动态添加'state'参数
+    // 纯所有买单数据
+    if(_index==0){
+      params['state'] = 'FINISH';
+      params['tradetype'] = 'BUY';
+    }
+    // 未卖出的买单
+    if(_index==1){
+      params['state'] = 'FINISH';
+      params['tradetype'] = 'BUY';
+      params['sellState'] = 'no';
+    }
+    // 卖单
+    if(_index==2){
+      params['state'] = 'FINISH';
+      params['tradetype'] = 'SELL';
+    }
+    // 进行中的订单
+    if(_index==3){
+      params['state'] = 'UNFINISH';
+    }
+    // 取消的订单
+    if(_index==4){
+      params['state'] = 'CANCEL';
+    }
+    debugPrint('加工后参数: $params');
+    return params;
+  }
 
   Future<void> _onRefresh() async {
-    // await Future.delayed(const Duration(seconds: 2), () {
-    //   setState(() {
-    //     _page = 1;
-    //     _list = List.generate(10, (i) => 'newItem：$i');
-    //   });
-    // });
-    final queryParameters = {
+    final queryParameters = <String, dynamic>{
       'page': _page,
-      'pageSize': 10,
+      'pageSize': 10
     };
     // 调用_getOrderList函数
-    _getOrderList(queryParameters, '_onRefresh');
+    _getOrderList(_addQueryParams(queryParameters), '_onRefresh');
   }
 
   // 将加载数据提取出来
@@ -133,6 +157,9 @@ class _OrderListPageState extends State<OrderListPage>
         List<Trade> tradeOrders = listRes
             .map((item) => Trade.fromJson(item as Map<String, dynamic>))
             .toList();
+        if(_index == 0){
+
+        };
         if (type == '_loadMore') {
           setState(() {
             _list.addAll(tradeOrders);
@@ -166,12 +193,12 @@ class _OrderListPageState extends State<OrderListPage>
     }
     _isLoading = true;
     try {
-      final queryParameters = {
+      final queryParameters = <String, dynamic>{
         'page': _page == 1 ? _page + 1 : _page,
-        'pageSize': 10,
+        'pageSize': 10
       };
       // 调用_getOrderList函数
-      _getOrderList(queryParameters, '_loadMore');
+      _getOrderList(_addQueryParams(queryParameters), '_loadMore');
     } catch (e) {
       debugPrint('加载更多失败: $e');
       _isLoading = false;

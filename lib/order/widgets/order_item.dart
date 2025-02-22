@@ -158,7 +158,7 @@ class OrderItem extends StatelessWidget {
               child: Gaps.empty,
             ),
             if (orderRightButtonText[tabIndex].isEmpty) Gaps.empty else Gaps.hGap10,
-            if (order.tradetype=='SELL') Gaps.empty else OrderItemButton(
+            if (order.tradetype=='SELL' || (order.sellState!='no' && order.tradetype=='BUY')) Gaps.empty else OrderItemButton(
               key: Key('order_button_3_$index'),
               text: '卖出',
               textColor: isDark ? Colours.dark_button_text : Colors.white,
