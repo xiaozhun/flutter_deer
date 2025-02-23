@@ -10,6 +10,8 @@ import 'package:flutter_deer/widgets/double_tap_back_exit_app.dart';
 import 'package:flutter_deer/widgets/load_image.dart';
 import 'package:provider/provider.dart';
 
+import '../order/page/count_page.dart';
+
 class Home extends StatefulWidget {
 
   const Home({super.key});
@@ -23,7 +25,7 @@ class _HomeState extends State<Home> with RestorationMixin{
   static const double _imageSize = 25.0;
 
   late List<Widget> _pageList;
-  final List<String> _appBarTitles = ['订单', '商品', '统计', '店铺'];
+  final List<String> _appBarTitles = ['订单', '数量', '统计', '店铺'];
   final PageController _pageController = PageController();
 
   HomeProvider provider = HomeProvider();
@@ -46,7 +48,8 @@ class _HomeState extends State<Home> with RestorationMixin{
   void initData() {
     _pageList = [
       const OrderPage(),
-      const GoodsPage(),
+      // const GoodsPage(),
+      const CountPage(),
       const StatisticsPage(),
       const ShopPage(),
     ];

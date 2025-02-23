@@ -88,17 +88,33 @@ class _OrderListPageState extends State<OrderListPage>
                 : SliverList(
                     delegate: SliverChildBuilderDelegate(
                         (BuildContext context, int index) {
-                      return index < _list.length
-                          ? (index % 5 == 0
-                              ? const OrderTagItem(
-                                  date: '2025年2月5日', orderTotal: 4)
-                              : OrderItem(
-                                  key: Key('order_item_$index'),
-                                  index: index,
-                                  tabIndex: _index,
-                                  order: _list[index]))
-                          : MoreWidget(_list.length, _hasMore(), 10);
-                    }, childCount: _list.length + 1),
+                          // 如果列表为空，显示空状态布局
+                          if (_list.isEmpty) {
+                            return SliverFillRemaining(child: StateLayout(type: _stateType));
+                          }
+
+                          // 只在第一个位置（index == 0）显示 OrderTagItem
+                          if (index == 0) {
+                            return const OrderTagItem(date: '2025年2月5日', orderTotal: 4);
+                          }
+
+                          // 对于其他位置，显示 OrderItem
+                          final adjustedIndex = index - 1; // 调整索引以适应 OrderTagItem 插入的位置
+
+                          // 确保调整后的索引不超过实际数据的长度
+                          if (adjustedIndex < _list.length) {
+                            return OrderItem(
+                              key: Key('order_item_$adjustedIndex'),
+                              index: adjustedIndex,
+                              tabIndex: _index,
+                              order: _list[adjustedIndex],
+                            );
+                          } else {
+                            // 显示加载更多数据的指示器
+                            return MoreWidget(_list.length, _hasMore(), 10);
+                          }
+                        },
+                        childCount: _list.length + 1),
                   ),
           ),
         ),

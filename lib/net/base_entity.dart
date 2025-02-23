@@ -39,6 +39,8 @@ class BaseEntity<T> {
       return json as T;
     }else if (T.toString() == 'Map<String, dynamic>') {
       return json as T;
+    }else if (T.toString() == 'List<Map<String, dynamic>>') {
+      return (json as List).map((item) => item as Map<String, dynamic>).toList() as T;
     } else {
       /// List类型数据由fromJsonAsT判断处理
       return JsonConvert.fromJsonAsT<T>(json);
